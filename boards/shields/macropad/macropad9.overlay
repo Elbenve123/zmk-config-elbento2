@@ -1,0 +1,90 @@
+/*
+ * MacroPad 9 teclas — Pro Micro NRF52840 genérico — Handwired 3×3
+ * Matriz: Col → Row  (col2row)
+ *
+ * ╔══════════════════════════════════════════════════════════╗
+ * ║              DIAGRAMA DE CABLEADO                        ║
+ * ║                                                          ║
+ * ║         COL0       COL1       COL2                       ║
+ * ║        pin  4     pin  5     pin  6                      ║
+ * ║           │          │          │                        ║
+ * ║  ROW0 ───[K1]────────[K2]───────[K3]──── pin 7          ║
+ * ║  ROW1 ───[K4]────────[K5]───────[K6]──── pin 8          ║
+ * ║  ROW2 ───[K7]────────[K8]───────[K9]──── pin 9          ║
+ * ║                                                          ║
+ * ║  Diodo por tecla:                                        ║
+ * ║    Ánodo  → pin del switch                               ║
+ * ║    Cátodo → alambre de columna  (banda plateada = COL)   ║
+ * ╚══════════════════════════════════════════════════════════╝
+ *
+ * Los números de pin (&pro_micro N) corresponden a los pads
+ * marcados en la placa. Puedes cambiarlos libremente según
+ * tu cableado real — solo edita col-gpios y row-gpios.
+ */
+
+#include <dt-bindings/zmk/matrix_transform.h>
+
+/ {
+
+    /* ── 1. KSCAN: escaneo GPIO de la matriz ──────────────────────── */
+    kscan0: kscan0 {
+        compatible = "zmk,kscan-gpio-matrix";
+        diode-direction = "col2row";
+        wakeup-source;
+
+        col-gpios
+            = <&pro_micro 4 GPIO_ACTIVE_HIGH>   /* COL0 — K1 K4 K7 */
+            , <&pro_micro 5 GPIO_ACTIVE_HIGH>   /* COL1 — K2 K5 K8 */
+            , <&pro_micro 6 GPIO_ACTIVE_HIGH>   /* COL2 — K3 K6 K9 */
+            ;
+
+        row-gpios
+            = <&pro_micro 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* ROW0 */
+            , <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* ROW1 */
+            , <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* ROW2 */
+            ;
+    };
+
+    /* ── 2. MATRIX TRANSFORM: fila/columna → posición en keymap ───── */
+    default_transform: keymap_transform_0 {
+        compatible = "zmk,matrix-transform";
+        columns = <3>;
+        rows = <3>;
+
+        /*
+         *  K1=RC(0,0)  K2=RC(0,1)  K3=RC(0,2)
+         *  K4=RC(1,0)  K5=RC(1,1)  K6=RC(1,2)
+         *  K7=RC(2,0)  K8=RC(2,1)  K9=RC(2,2)
+         */
+        map = <
+            RC(0,0) RC(0,1) RC(0,2)
+            RC(1,0) RC(1,1) RC(1,2)
+            RC(2,0) RC(2,1) RC(2,2)
+        >;
+    };
+
+    /* ── 3. PHYSICAL LAYOUT: une kscan + transform ────────────────── */
+    physical_layout0: physical_layout_0 {
+        compatible = "zmk,physical-layout";
+        display-name = "Default";
+        kscan = <&kscan0>;
+        transform = <&default_transform>;
+
+        /*
+         * Posiciones físicas para ZMK Studio (opcional).
+         * Unidad: centiU (100 = 1U).  Formato por tecla:
+         *   <ancho alto  x    y   rotación rx ry>
+         */
+        keys
+            = <&key_physical_attrs 100 100    0    0 0 0 0>   /* K1 */
+            , <&key_physical_attrs 100 100  100    0 0 0 0>   /* K2 */
+            , <&key_physical_attrs 100 100  200    0 0 0 0>   /* K3 */
+            , <&key_physical_attrs 100 100    0  100 0 0 0>   /* K4 */
+            , <&key_physical_attrs 100 100  100  100 0 0 0>   /* K5 */
+            , <&key_physical_attrs 100 100  200  100 0 0 0>   /* K6 */
+            , <&key_physical_attrs 100 100    0  200 0 0 0>   /* K7 */
+            , <&key_physical_attrs 100 100  100  200 0 0 0>   /* K8 */
+            , <&key_physical_attrs 100 100  200  200 0 0 0>   /* K9 */
+            ;
+    };
+};

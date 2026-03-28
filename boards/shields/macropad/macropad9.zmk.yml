@@ -1,0 +1,11 @@
+file_format: "1"
+id: macropad9
+name: MacroPad9
+type: shield
+url: https://github.com/tuusuario/zmk-macropad9
+requires:
+  - pro_micro
+features:
+  - keys
+tags:
+  - macropad
