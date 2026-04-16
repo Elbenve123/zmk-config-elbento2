@@ -1,7 +1,0 @@
-if SHIELD_MACROPAD9
-
-# Máximo 16 caracteres
-config ZMK_KEYBOARD_NAME
-    default "MacroPad9"
-
-endif
